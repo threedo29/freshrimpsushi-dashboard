@@ -31,16 +31,16 @@ if (!isset($_SESSION['admin_id'])) {
                         <p>카테고리댓글</p>
                     </a>
                 </li>
-                <li class="nav-item ">
+                <!-- <li class="nav-item ">
                     <a class="nav-link" href="./404page.php">
                         <i class="material-icons">library_books</i>
                         <p>404페이지댓글</p>
                     </a>
-                </li>
+                </li> -->
                 <li class="nav-item active ">
                     <a class="nav-link" href="./all_comment.php">
                         <i class="material-icons">library_books</i>
-                        <p>전체댓글</p>
+                        <p>전체댓글(임시)</p>
                     </a>
                 </li>
             </ul>
@@ -119,15 +119,31 @@ if (!isset($_SESSION['admin_id'])) {
     }
 
     function modify_comment(cmt_idx, is_child) {
-        let author = $(".comment" + cmt_idx + " .author").html();
-        let content = $(".comment" + cmt_idx + " .content p").html();
-        let textarea = $(".comment" + cmt_idx + " .content");
-        let str = '';
-        str += '<input type="hidden" value="' + content + '">';
-        str += '<textarea name="comment" value="" placeholder="내용" style="IME-MODE:active;">' + content + '</textarea>';
-        str += '<div class="btn_modify" onclick="modify_comment_cancel(' + cmt_idx + ', ' + is_child + ');">취소</div>';
-        str += '<div class="btn_modify" onclick="modify_comment_click(' + cmt_idx + ');">수정</div>';
-        textarea.html(str);
+        $.ajax({
+            type: "POST",
+            url: "<?php echo AJAX_URL; ?>/ajax.comment.php?action=getComment",
+            data: {
+                cmt_idx: cmt_idx
+            },
+            dataType: "json",
+            success: function(data) {
+                let msg = data['msg'];
+                let rows = data['rows'];
+                if (msg) {
+                    let str = '';
+                    let content = rows[0]['content'];
+                    let textarea = $(".comment" + cmt_idx + " .content");
+                    str += '<input type="hidden" value="' + content + '">';
+                    str += '<textarea name="comment" value="" placeholder="내용" stype="IME-MODE:active;">' + content + '</textarea>';
+                    str += '<div class="btn_modify" onclick="modify_comment_cancel(' + cmt_idx + ', ' + is_child + ');">취소</div>';
+                    str += '<div class="btn_modify" onclick="modify_comment_click(' + cmt_idx + ');">수정</div>';
+                    textarea.html(str);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log(error);
+            }
+        });
     }
 
     function delete_comment(cmt_idx) {
@@ -177,24 +193,11 @@ if (!isset($_SESSION['admin_id'])) {
     }
 
     function re_comment_cancel(cmt_idx) {
-        let content = $('.comment' + cmt_idx + ' .content');
-        $('.comment' + cmt_idx + ' .content textarea').remove();
-        $('.comment' + cmt_idx + ' .content div').remove();
-        let str = "";
-        str += '<div class="re-comment-btn" onclick="re_comment(' + cmt_idx + ');">답글</div>';
-        content.append(str);
-        str = "";
+        location.reload();
     }
 
     function modify_comment_cancel(cmt_idx, is_child) {
-        let textarea = $(".comment" + cmt_idx + " .content");
-        let content = $('.comment' + cmt_idx + ' .content input[type=hidden]').val();
-        let str = "";
-        str += '<p>' + content + '</p>';
-        if (!is_child) {
-            str += '<div class="re-comment-btn" onclick="re_comment(' + cmt_idx + ');">답글</div>';
-        }
-        textarea.html(str);
+        location.reload();
     }
 
     function modify_comment_click(cmt_idx) {

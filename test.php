@@ -37,6 +37,12 @@ if (!isset($_SESSION['admin_id'])) {
                         <p>404페이지댓글</p>
                     </a>
                 </li>
+                <li class="nav-item ">
+                    <a class="nav-link" href="./all_comment.php">
+                        <i class="material-icons">library_books</i>
+                        <p>전체댓글</p>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
@@ -112,16 +118,32 @@ if (!isset($_SESSION['admin_id'])) {
         window.open('https://freshrimpsushi.github.io/posts/' + slug + '#comment' + cmt_idx, '_blank');
     }
 
-    function modify_comment(cmt_idx) {
-        let author = $(".comment" + cmt_idx + " .author").html();
-        let content = $(".comment" + cmt_idx + " .content p").html();
-        let textarea = $(".comment" + cmt_idx + " .content");
-        let str = '';
-        str += '<input type="hidden" value="'+content+'">';
-        str += '<textarea name="comment" value="" placeholder="내용" style="IME-MODE:active;">' + content + '</textarea>';
-        str += '<div class="btn_modify" onclick="modify_comment_cancel(' + cmt_idx + ');">취소</div>';
-        str += '<div class="btn_modify" onclick="modify_comment_click(' + cmt_idx + ');">수정</div>';
-        textarea.html(str);
+    function modify_comment(cmt_idx, is_child) {
+        $.ajax({
+            type: "POST",
+            url: "<?php echo AJAX_URL; ?>/ajax.comment.php?action=getComment",
+            data: {
+                cmt_idx: cmt_idx
+            },
+            dataType: "json",
+            success: function(data) {
+                let msg = data['msg'];
+                let rows = data['rows'];
+                if (msg) {
+                    let str = '';
+                    let content = rows[0]['content'];
+                    let textarea = $(".comment" + cmt_idx + " .content");
+                    str += '<input type="hidden" value="' + content + '">';
+                    str += '<textarea name="comment" value="" placeholder="내용" stype="IME-MODE:active;">' + content + '</textarea>';
+                    str += '<div class="btn_modify" onclick="modify_comment_cancel(' + cmt_idx + ', ' + is_child + ');">취소</div>';
+                    str += '<div class="btn_modify" onclick="modify_comment_click(' + cmt_idx + ');">수정</div>';
+                    textarea.html(str);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log(error);
+            }
+        });
     }
 
     function delete_comment(cmt_idx) {
@@ -171,24 +193,11 @@ if (!isset($_SESSION['admin_id'])) {
     }
 
     function re_comment_cancel(cmt_idx) {
-        let content = $('.comment' + cmt_idx + ' .content');
-        $('.comment' + cmt_idx + ' .content textarea').remove();
-        $('.comment' + cmt_idx + ' .content div').remove();
-        let str = "";
-        str += '<div class="re-comment-btn" onclick="re_comment(' + cmt_idx + ');">답글</div>';
-        content.append(str);
-        str = "";
+        location.reload();
     }
 
-    function modify_comment_cancel(cmt_idx) {
-        let textarea = $(".comment" + cmt_idx + " .content");
-        let content = $('.comment'+cmt_idx + ' .content input[type=hidden]').val();
-        let str = "";
-        str += '<td class="content">';
-        str += '<p>'+content+'</p>';
-        str += '<div class="re-comment-btn" onclick="re_comment(3);">답글</div>';
-        str += '</td>';
-        textarea.html(str);
+    function modify_comment_cancel(cmt_idx, is_child) {
+        location.reload();
     }
 
     function modify_comment_click(cmt_idx) {
@@ -269,7 +278,7 @@ if (!isset($_SESSION['admin_id'])) {
                         str += '<td class="board_title">' + rows[i]["board_title"] + '</td>';
                         str += '<td class="datetime">' + rows[i]["datetime"] + '</td>';
                         str += '<td class="url">' + '<div class="url-button" onclick="goto_url(\'' + rows[i]["board_slug"] + '\', ' + rows[i]["cmt_idx"] + ');">이동</div>';
-                        str += '<div class="url-button" onclick="delete_comment(' + rows[i]["cmt_idx"] + ');">삭제</div><div class="modify-button" onclick="modify_comment(' + rows[i]["cmt_idx"] + ');">수정</div></td>';
+                        str += '<div class="url-button" onclick="delete_comment(' + rows[i]["cmt_idx"] + ');">삭제</div><div class="modify-button" onclick="modify_comment(' + rows[i]["cmt_idx"] + ', 0);">수정</div></td>';
                         str += '</tr>';
                         tbody.append(str);
                         str = "";
@@ -282,13 +291,29 @@ if (!isset($_SESSION['admin_id'])) {
                             str += '<td class="board_title">' + rows[i]["child"][j]["board_title"] + '</td>';
                             str += '<td class="datetime">' + rows[i]["child"][j]["datetime"] + '</td>';
                             str += '<td class="url">' + '<div class="url-button" onclick="goto_url(\'' + rows[i]["child"][j]["board_slug"] + '\', ' + rows[i]["child"][j]["cmt_idx"] + ');">이동</div>';
-                            str += '<div class="url-button" onclick="delete_comment(' + rows[i]["child"][j]["cmt_idx"] + ');">삭제</div><div class="modify-button" onclick="modify_comment(' + rows[i]["child"][j]["cmt_idx"] + ');">수정</div></td>';
+                            str += '<div class="url-button" onclick="delete_comment(' + rows[i]["child"][j]["cmt_idx"] + ');">삭제</div><div class="modify-button" onclick="modify_comment(' + rows[i]["child"][j]["cmt_idx"] + ', 1);">수정</div></td>';
                             str += '</tr>';
                             tbody.append(str);
                             str = "";
                         }
                     }
                 }
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                    ],
+                    trust: ["\\htmlId"],
+                    macros: {
+                    "\\eqref": "\\href{###1}{(\\text{#1})}",
+                    "\\ref": "\\href{###1}{\\text{#1}}",
+                    "\\label": "\\htmlId{#1}{}"
+                    },
+                    // • rendering keys, e.g.:
+                    throwOnError : false
+                });
             },
             error: function(xhr, status, error) {
                 console.log(error);

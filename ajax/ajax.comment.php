@@ -8,16 +8,80 @@ if ($_GET['action'] == "getComment") {
     if (mysqli_connect_errno()) {
         echo "MySQL 연결에 실패하였습니다 : " . mysqli_connect_error();
     } else {
-        $query1 = "SELECT *
-                   FROM `comment`
-                   WHERE `is_deleted` = 0 AND `board_idx` > 0
-                   ORDER BY `datetime` DESC;";
-        $result1 = mysqli_query($connect_db, $query1);
+        if (isset($_POST['cmt_idx'])) {
+            $cmt_idx = $_POST['cmt_idx'];
+        } else {
+            $cmt_idx = 0;
+        }
 
-        $rows = array();
+        if($cmt_idx == 0)
+        {
+            $query1 = "SELECT *
+                       FROM `comment`
+                       WHERE `is_deleted` = 0
+                       ORDER BY `datetime` DESC;";
+            $result1 = mysqli_query($connect_db, $query1);
 
-        while ($row = mysqli_fetch_array($result1)) {
-            if ($row['parent_cmt_idx'] == -1) {
+            $rows = array();
+
+            while ($row = mysqli_fetch_array($result1)) {
+                if ($row['parent_cmt_idx'] == -1) {
+                    array_push($rows, array(
+                        "cmt_idx" => $row['cmt_idx'],
+                        "board_idx" => $row['board_idx'],
+                        "board_slug" => $row['board_slug'],
+                        "board_title" => $row['board_title'],
+                        "parent_cmt_idx" => $row['parent_cmt_idx'],
+                        "child_cnt" => $row['child_cnt'],
+                        "child" => array(),
+                        "author" => $row['author'],
+                        "content" => $row['content'],
+                        "datetime" => $row['datetime'],
+                        "modify_datetime" => $row['modify_datetime'],
+                        "is_deleted" => $row['is_deleted']
+                    ));
+                }
+            }
+
+            $cnt = count($rows);
+            for ($i = 0; $i < $cnt; $i++) {
+                if ($rows[$i]['child_cnt'] != 0) {
+                    $query2 = "SELECT *
+                            FROM `comment`
+                            WHERE `parent_cmt_idx` = {$rows[$i]['cmt_idx']} AND `is_deleted` = 0
+                            ORDER BY `datetime` ASC";
+                    $result2 = mysqli_query($connect_db, $query2);
+
+                    while ($row = mysqli_fetch_array($result2)) {
+                        array_push($rows[$i]['child'], array(
+                            "cmt_idx" => $row['cmt_idx'],
+                            "board_idx" => $row['board_idx'],
+                            "board_slug" => $row['board_slug'],
+                            "board_title" => $row['board_title'],
+                            "parent_cmt_idx" => $row['parent_cmt_idx'],
+                            "child_cnt" => $row['child_cnt'],
+                            "author" => $row['author'],
+                            "content" => $row['content'],
+                            "datetime" => $row['datetime'],
+                            "modify_datetime" => $row['modify_datetime'],
+                            "is_deleted" => $row['is_deleted']
+                        ));
+                    }
+                }
+            }
+
+            mysqli_close($connect_db);
+            echo json_encode(array("msg" => true, "rows" => $rows));
+        } else {
+            $query1 = "SELECT *
+                       FROM `comment`
+                       WHERE `is_deleted` = 0 AND `cmt_idx` = {$cmt_idx}
+                       ORDER BY `datetime` DESC;";
+            $result1 = mysqli_query($connect_db, $query1);
+            
+            $rows = array();
+
+            while ($row = mysqli_fetch_array($result1)) {
                 array_push($rows, array(
                     "cmt_idx" => $row['cmt_idx'],
                     "board_idx" => $row['board_idx'],
@@ -33,37 +97,10 @@ if ($_GET['action'] == "getComment") {
                     "is_deleted" => $row['is_deleted']
                 ));
             }
+
+            mysqli_close($connect_db);
+            echo json_encode(array("msg" => true, "rows" => $rows));
         }
-
-        $cnt = count($rows);
-        for ($i = 0; $i < $cnt; $i++) {
-            if ($rows[$i]['child_cnt'] != 0) {
-                $query2 = "SELECT *
-                           FROM `comment`
-                           WHERE `parent_cmt_idx` = {$rows[$i]['cmt_idx']} AND `is_deleted` = 0
-                           ORDER BY `datetime` ASC";
-                $result2 = mysqli_query($connect_db, $query2);
-
-                while ($row = mysqli_fetch_array($result2)) {
-                    array_push($rows[$i]['child'], array(
-                        "cmt_idx" => $row['cmt_idx'],
-                        "board_idx" => $row['board_idx'],
-                        "board_slug" => $row['board_slug'],
-                        "board_title" => $row['board_title'],
-                        "parent_cmt_idx" => $row['parent_cmt_idx'],
-                        "child_cnt" => $row['child_cnt'],
-                        "author" => $row['author'],
-                        "content" => $row['content'],
-                        "datetime" => $row['datetime'],
-                        "modify_datetime" => $row['modify_datetime'],
-                        "is_deleted" => $row['is_deleted']
-                    ));
-                }
-            }
-        }
-
-        mysqli_close($connect_db);
-        echo json_encode(array("msg" => true, "rows" => $rows));
     }
 }
 else if ($_GET['action'] == "deleteComment") {

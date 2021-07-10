@@ -31,16 +31,16 @@ if (!isset($_SESSION['admin_id'])) {
                         <p>카테고리댓글</p>
                     </a>
                 </li>
-                <li class="nav-item active ">
+                <!-- <li class="nav-item active ">
                     <a class="nav-link" href="./404page.php">
                         <i class="material-icons">library_books</i>
                         <p>404페이지댓글</p>
                     </a>
-                </li>
+                </li> -->
                 <li class="nav-item ">
                     <a class="nav-link" href="./all_comment.php">
                         <i class="material-icons">library_books</i>
-                        <p>전체댓글</p>
+                        <p>전체댓글(임시)</p>
                     </a>
                 </li>
             </ul>

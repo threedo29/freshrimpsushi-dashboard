@@ -14,6 +14,7 @@ include_once("common.lib.php");
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="css/material-dashboard.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" integrity="sha384-Um5gpz1odJg5Z4HAmzPtgZKdTBHZdw8S29IecapCSB31ligYPhHQZMIlWLYQGVoc" crossorigin="anonymous">
 
     <link rel="stylesheet" type="text/css" href="css/easyui.css">
     <link rel="stylesheet" type="text/css" href="css/icon.css">
@@ -24,6 +25,10 @@ include_once("common.lib.php");
     <script type="text/javascript" src="js/bootstrap-material-design.min.js"></script>
     <script type="text/javascript" src="js/material-dashboard.min.js"></script>
     <script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+
+    
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js" integrity="sha384-YNHdsYkH6gMx9y3mRkmcJ2mFUjTd0qNQQvY9VYZgQd7DcN7env35GzlmFaZ23JGp" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous"></script>
 
     <title>생새우초밥집 관리창고</title>
 </head>

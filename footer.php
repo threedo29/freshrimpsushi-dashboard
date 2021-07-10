@@ -6,7 +6,7 @@
         </div>
     </footer>-->
     
-<script async='async' src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML,Safe' type='text/javascript'>
+<!-- <script async='async' src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML,Safe' type='text/javascript'>
 MathJax.Hub.Config({
     messageStyle: "none",
     jax: ["input/TeX", "output/HTML-CSS"],
@@ -25,6 +25,26 @@ MathJax.Hub.Config({
     }//displayAlign: "left" 디스플레이 모드도 왼쪽정렬
                 
 });
+</script> -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          // customised options
+          // • auto-render specific keys, e.g.:
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+          ],
+		  trust: ["\\htmlId"],
+		  macros: {
+		  "\\eqref": "\\href{###1}{(\\text{#1})}",
+		  "\\ref": "\\href{###1}{\\text{#1}}",
+		  "\\label": "\\htmlId{#1}{}"
+		  },
+          // • rendering keys, e.g.:
+          throwOnError : false
+        });
+    });
 </script>
 </body>
 </html>

@@ -293,6 +293,22 @@ if (!isset($_SESSION['admin_id'])) {
                         }
                     }
                 }
+                renderMathInElement(document.body, {
+                    // customised options
+                    // • auto-render specific keys, e.g.:
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                    ],
+                    trust: ["\\htmlId"],
+                    macros: {
+                    "\\eqref": "\\href{###1}{(\\text{#1})}",
+                    "\\ref": "\\href{###1}{\\text{#1}}",
+                    "\\label": "\\htmlId{#1}{}"
+                    },
+                    // • rendering keys, e.g.:
+                    throwOnError : false
+                });
             },
             error: function(xhr, status, error) {
                 console.log(error);

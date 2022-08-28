@@ -1,1 +1,5 @@
+.vscode
+node_modules
+.prettierrc
+
 db_config.php
